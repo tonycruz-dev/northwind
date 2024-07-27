@@ -1,6 +1,11 @@
 
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using NorthwindApi.Data;
+using NorthwindApi.EntityDataModels;
+using NorthwindApi.Interfaces;
+using NorthwindApi.Repository_;
+using System.Text.Json.Serialization;
 
 namespace NorthwindApi
 {
@@ -12,10 +17,27 @@ namespace NorthwindApi
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            })
+            .AddOData(opt => opt.AddRouteComponents(
+                "odata",
+             new NorthwindDataModel()
+            .GetEntityDataModel())
+            .Filter()
+            .Expand()
+            .Select()
+            .OrderBy()
+            .Count()
+            .SetMaxTop(1000)
+            .SkipToken());
             builder.Services.AddDbContext<NorthwindContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("Northwind")));
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            builder.Services.AddScoped<ISalesCategory, SalesCategory>();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
