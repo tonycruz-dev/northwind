@@ -1,0 +1,3 @@
+ ng add @angular/material
+ ng g c shared/components/custom-sidenav --skip-tests
+ ng g c shared/components/menu-item --skip-tests
